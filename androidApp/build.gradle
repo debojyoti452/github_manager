@@ -1,0 +1,185 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileSdk versions.compileSdk
+
+    defaultConfig {
+        applicationId "com.swing.githubmanager"
+        minSdk versions.minSdk
+        targetSdk versions.targetSdk
+        versionCode versions.versionCode
+        versionName versions.versionName
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled = true
+//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.swing.githubmanager.HiltTestRunner"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            buildConfigField "String", 'GIT_CLIENT_ID', "\"" + getLocalPropertiesValue("git_client_id") + "\""
+            buildConfigField "String", 'GIT_CLIENT_SECRET', "\"" + getLocalPropertiesValue("git_secret") + "\""
+            buildConfigField "String", 'GIT_API_URL', "\"" + getLocalPropertiesValue("git_api_url") + "\""
+            buildConfigField "String", 'GIT_TOKEN', "\"" + getLocalPropertiesValue("git_gha_token") + "\""
+            manifestPlaceholders = [gitHost: "\"" + getLocalPropertiesValue("git_host") + "\""]
+        }
+        release {
+            minifyEnabled false
+            buildConfigField "String", 'GIT_CLIENT_ID', "\"" + getLocalPropertiesValue("git_client_id") + "\""
+            buildConfigField "String", 'GIT_CLIENT_SECRET', "\"" + getLocalPropertiesValue("git_secret") + "\""
+            buildConfigField "String", 'GIT_API_URL', "\"" + getLocalPropertiesValue("git_api_url") + "\""
+            buildConfigField "String", 'GIT_TOKEN', "\"" + getLocalPropertiesValue("git_gha_token") + "\""
+            manifestPlaceholders = [gitHost: "\"" + getLocalPropertiesValue("git_host") + "\""]
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    lintOptions {
+        lintConfig file("lint.xml")
+        disable "IncompatibleIidVersion"
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/*'
+        exclude 'plugin.properties'
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
+    }
+
+    ndkVersion "25.1.8937393"
+
+    kapt {
+        correctErrorTypes = true
+    }
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs += "-Xskip-prerelease-check"
+    }
+}
+
+dependencies {
+    implementation deps.material.core
+    implementation deps.hilt.hilt
+
+
+    implementation(
+            deps.androidx.core,
+            deps.androidx.appCompat,
+            deps.androidx.couroutines.core,
+            deps.androidx.couroutines.android,
+            deps.androidx.lifecycle.viewmodel,
+            deps.androidx.lifecycle.viewmodelKtx,
+            deps.androidx.lifecycle.livedata,
+            deps.androidx.navigation.fragment,
+            deps.androidx.navigation.ui,
+            deps.androidx.constraintLayout,
+            deps.androidx.splash,
+            deps.androidx.swipeRefresh,
+            deps.androidx.multiDex,
+    )
+
+    kapt(
+            deps.hilt.hiltAndroidCompiler,
+            deps.hilt.hiltCompiler
+    )
+
+    implementation(
+            deps.coil,
+            deps.github.login,
+    )
+
+    implementation(deps.md_reader) {
+        exclude group: 'com.android.support', module: 'support-compat'
+    }
+
+    implementation(
+            deps.network.okhttp.core,
+            deps.network.okhttp.logging,
+            deps.network.retrofit.core,
+            deps.network.retrofit.converter,
+            deps.network.retrofit.adapter,
+    )
+
+    testImplementation(
+            deps.tests.core,
+            deps.tests.runner,
+            deps.tests.jUnit,
+            deps.tests.truth,
+            deps.tests.testRule,
+            deps.tests.mockk,
+            deps.tests.coroutinesAndroidTest,
+            deps.tests.coroutinesTest,
+            deps.tests.archCoreTest,
+    )
+
+    androidTestImplementation(
+            deps.tests.espressoCore,
+            deps.tests.testRule,
+            deps.tests.runner,
+
+            deps.instrumentedTestDependencies.daggerHilt,
+            deps.instrumentedTestDependencies.junit,
+            deps.instrumentedTestDependencies.androidArch,
+            deps.instrumentedTestDependencies.googleTruth,
+            deps.instrumentedTestDependencies.extensionJunit,
+            deps.instrumentedTestDependencies.ktxCore,
+            deps.instrumentedTestDependencies.mockServer,
+            deps.instrumentedTestDependencies.mockk,
+            deps.instrumentedTestDependencies.androidXRunner,
+            deps.instrumentedTestDependencies.espresso,
+            deps.instrumentedTestDependencies.androidXRule,
+            deps.instrumentedTestDependencies.navigationTest,
+    )
+
+    debugImplementation(deps.instrumentedTestDependencies.fragmentTest) {
+        exclude group: 'androidx.test', module: 'core'
+    }
+
+    androidTestImplementation(deps.instrumentedTestDependencies.coroutines) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    androidTestImplementation(deps.instrumentedTestDependencies.expressoContribution) {
+        exclude group: 'org.checkerframework', module: 'checker'
+    }
+
+    kaptAndroidTest(deps.instrumentedTestDependencies.kaptDagger)
+}
+
+/**
+ * get value from local.properties
+ *
+ * @return value of the key
+ */
+def getLocalPropertiesValue(key) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty(key)
+}
