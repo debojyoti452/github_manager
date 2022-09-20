@@ -28,10 +28,10 @@ jobs:
       run: chmod +x gradlew
 #    - name: Unit tests
 #      run: bash ./gradlew test --stacktrace
-    - name: Link && Detekt
-      run: |
-          ./gradlew lint
-          ./gradlew detekt
-      
+#    - name: Link && Detekt
+#      run: |
+#          ./gradlew lint
+#          ./gradlew detekt
+#
 #     - name: Build with Gradle
 #       run: ./gradlew build
