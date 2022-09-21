@@ -21,6 +21,6 @@ data class Params(
     val sort: String = "stars",
     val order: String = "desc",
     val page: Int = 1,
-    val perPage: Int = 8,
+    val perPage: Int = 7,
     val onLoadMode: Boolean = false,
 )

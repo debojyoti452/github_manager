@@ -24,6 +24,9 @@ import com.swing.githubmanager.data.utils.BaseModel
 import com.swing.githubmanager.data.utils.CustomException
 import com.swing.githubmanager.data.utils.GMExceptionHandler
 import com.swing.githubmanager.domain.repository.GMRepository
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class GMRemoteImpl @Inject constructor(
@@ -79,21 +82,23 @@ class GMRemoteImpl @Inject constructor(
     }
 
     override suspend fun getLanguageData(name: String): Map<String, Int> {
-        val result = runCatching { service.getLanguageData(name = name) }
+        val data = mutableMapOf<Deferred<String>, Deferred<Int>>()
 
-        if (result.isFailure) {
-            result.exceptionOrNull()?.let {
-                val errMessage = GMExceptionHandler.extractErrorMessage(it)
-                throw CustomException(errMessage)
+        coroutineScope {
+            val result = async {
+                try {
+                    service.getLanguageData(name = name)
+                } catch (e: Exception) {
+                    val errMessage = GMExceptionHandler.extractErrorMessage(e)
+                    throw CustomException(errMessage)
+                }
+            }
+
+            result.await().forEach { (key, value) ->
+                data[async { key }] = async { value }
             }
         }
 
-        val response: Map<String, Int>? = result.getOrNull()
-
-        response?.let {
-            return it
-        }
-
-        return emptyMap()
+        return data.map { it.key.await() to it.value.await() }.toMap()
     }
 }

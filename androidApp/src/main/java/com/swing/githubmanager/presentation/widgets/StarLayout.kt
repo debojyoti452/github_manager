@@ -18,6 +18,7 @@ package com.swing.githubmanager.presentation.widgets
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
@@ -31,7 +32,7 @@ class StarLayout @JvmOverloads constructor(
     private val paint = Paint()
 
     init {
-        paint.color = 0xFF000000.toInt()
+        paint.color = Color.BLACK
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
     }

@@ -76,8 +76,17 @@ class TrendingViewHolder(val binding: LayoutTrendingItemBinding) :
         }
 
         // setting shared transition name
-        binding.itemTrendingIV.transitionName = item.owner?.avatarUrl ?: AppConstants.SHARED_NAVIGATION_KEY
-        binding.itemTrendingDescTV.transitionName = item.description?: AppConstants.SHARED_NAVIGATION_KEY
-        binding.itemLanguageGraphView.transitionName = item.fullName?: AppConstants.SHARED_NAVIGATION_KEY
+        binding.itemTrendingIV.transitionName =
+            item.owner?.avatarUrl ?: AppConstants.SHARED_NAVIGATION_KEY
+        binding.itemTrendingDescTV.transitionName =
+            item.description ?: AppConstants.SHARED_NAVIGATION_KEY
+        binding.itemLanguageGraphView.transitionName =
+            item.fullName ?: AppConstants.SHARED_NAVIGATION_KEY
+
+        // rotate animation in circular mode
+        binding.itemTrendingIV.apply {
+            rotation = 0f
+            animate().rotationBy(360f).setDuration(1000).start()
+        }
     }
 }
