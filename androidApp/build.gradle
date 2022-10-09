@@ -85,6 +85,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 dependencies {
+    implementation project(':gitmanagersharedmodule')
     implementation deps.material.core
     implementation deps.hilt.hilt
 
