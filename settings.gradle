@@ -15,4 +15,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "GitHub Manager"
 include ':androidApp'
+include ':iosApp'
 include ':gitmanagersharedmodule'

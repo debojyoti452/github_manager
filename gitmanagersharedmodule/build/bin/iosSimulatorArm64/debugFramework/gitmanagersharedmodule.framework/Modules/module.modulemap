@@ -1,0 +1,8 @@
+framework module gitmanagersharedmodule {
+    umbrella header "gitmanagersharedmodule.h"
+
+    export *
+    module * { export * }
+
+    use Foundation
+}
